@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文四字词语猜词游戏</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🎯 中文猜词游戏</h1>
+            <p class="subtitle">猜一个四字词语，最多6次机会</p>
+        </header>
+
+        <main class="game-area">
+            <!-- 游戏规则说明 -->
+            <div class="rules" id="rules">
+                <div class="rules-content">
+                    <h3>🎮 游戏规则</h3>
+                    <ul>
+                        <li><span class="color-demo green">绿色</span> = 字符在正确位置</li>
+                        <li><span class="color-demo yellow">黄色</span> = 字符存在但位置错误</li>
+                        <li><span class="color-demo gray">灰色</span> = 字符不存在于答案中</li>
+                    </ul>
+                    <p>每行显示：汉字、拼音、声调</p>
+                    <button class="btn btn-primary" onclick="startNewGame()">开始游戏</button>
+                </div>
+            </div>
+
+            <!-- 游戏网格 -->
+            <div class="game-grid" id="gameGrid" style="display: none;">
+                <!-- 历史猜测记录 -->
+                <div class="guess-history" id="guessHistory">
+                    <!-- 动态生成的猜测记录 -->
+                </div>
+
+                <!-- 当前输入行 -->
+                <div class="current-guess" id="currentGuess">
+                    <div class="guess-row">
+                        <div class="char-block">
+                            <div class="char">?</div>
+                            <div class="pinyin">?</div>
+                            <div class="tone">?</div>
+                        </div>
+                        <div class="char-block">
+                            <div class="char">?</div>
+                            <div class="pinyin">?</div>
+                            <div class="tone">?</div>
+                        </div>
+                        <div class="char-block">
+                            <div class="char">?</div>
+                            <div class="pinyin">?</div>
+                            <div class="tone">?</div>
+                        </div>
+                        <div class="char-block">
+                            <div class="char">?</div>
+                            <div class="pinyin">?</div>
+                            <div class="tone">?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="input-area" id="inputArea" style="display: none;">
+                <div class="input-group">
+                    <input type="text" 
+                           id="wordInput" 
+                           placeholder="请输入四字词语..." 
+                           maxlength="4"
+                           autocomplete="off">
+                    <button class="btn btn-primary" onclick="submitGuess()">提交</button>
+                </div>
+                <div class="game-info">
+                    <span id="attemptInfo">第 1 次 / 共 6 次</span>
+                    <button class="btn btn-secondary" onclick="newGame()">新游戏</button>
+                </div>
+            </div>
+
+            <!-- 游戏结果 -->
+            <div class="game-result" id="gameResult" style="display: none;">
+                <div class="result-content">
+                    <h2 id="resultTitle"></h2>
+                    <p id="resultMessage"></p>
+                    <div id="answerDetails" style="display: none;">
+                        <h3>正确答案详情：</h3>
+                        <div id="answerGrid" class="answer-grid"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="newGame()">再玩一局</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 加载状态 -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>处理中...</p>
+        </div>
+
+        <!-- 错误提示 -->
+        <div class="toast" id="toast">
+            <div class="toast-content">
+                <span id="toastMessage"></span>
+                <button class="toast-close" onclick="hideToast()">&times;</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
