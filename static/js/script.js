@@ -2,7 +2,7 @@
 let gameState = {
     gameId: null,
     attempts: 0,
-    maxAttempts: 6,
+    maxAttempts: 15,
     gameOver: false,
     won: false,
     guessHistory: []
@@ -94,7 +94,7 @@ async function submitGuess() {
         return;
     }
     
-    // 检查是否只包含中文字符
+    // 检查是否只包含中文字符（仅在提交时检查）
     const chineseOnly = word.replace(/[^\u4e00-\u9fa5]/g, '');
     if (word !== chineseOnly) {
         showToast('请只输入中文字符');
@@ -114,6 +114,7 @@ async function submitGuess() {
             showGameResult(result);
         } else {
             elements.wordInput.value = '';
+            clearCurrentGuess();
             elements.wordInput.focus();
         }
     } else {
@@ -361,14 +362,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 输入字数限制（移除中文字符限制，允许输入法正常工作）
-    elements.wordInput.addEventListener('input', function(e) {
-        const value = e.target.value;
-        // 只限制最大长度，不限制字符类型（支持输入法）
-        if (value.length > 4) {
-            e.target.value = value.substring(0, 4);
-        }
-    });
+    // 移除输入过程中的字符限制，支持输入法正常工作
+    // 字符类型和长度检查都移到提交时进行
 });
 
 // 更新当前猜测的拼音和声调信息
