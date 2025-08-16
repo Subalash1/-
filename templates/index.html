@@ -75,6 +75,7 @@
                 </div>
                 <div class="game-info">
                     <span id="attemptInfo">第 1 次 / 共 15 次</span>
+                    <button class="btn btn-secondary" onclick="toggleAlphabetTable()">速查表</button>
                     <button class="btn btn-secondary" onclick="newGame()">新游戏</button>
                 </div>
             </div>
@@ -89,6 +90,25 @@
                         <div id="answerGrid" class="answer-grid"></div>
                     </div>
                     <button class="btn btn-primary" onclick="newGame()">再玩一局</button>
+                </div>
+            </div>
+
+            <!-- 字母表速查 -->
+            <div class="alphabet-table" id="alphabetTable" style="display: none;">
+                <div class="alphabet-content">
+                    <div class="alphabet-header">
+                        <h3>🔤 拼音字母速查表</h3>
+                        <button class="alphabet-close" onclick="toggleAlphabetTable()">&times;</button>
+                    </div>
+                    <div class="alphabet-legend">
+                        <span class="legend-item"><span class="legend-color unknown"></span>未检验</span>
+                        <span class="legend-item"><span class="legend-color absent"></span>确定不存在</span>
+                        <span class="legend-item"><span class="legend-color present"></span>位置不正确</span>
+                        <span class="legend-item"><span class="legend-color correct"></span>已确认位置</span>
+                    </div>
+                    <div class="alphabet-grid" id="alphabetGrid">
+                        <!-- 字母将通过JavaScript动态生成 -->
+                    </div>
                 </div>
             </div>
         </main>

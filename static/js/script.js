@@ -5,7 +5,8 @@ let gameState = {
     maxAttempts: 15,
     gameOver: false,
     won: false,
-    guessHistory: []
+    guessHistory: [],
+    alphabetStatus: {} // 字母状态：unknown, absent, present
 };
 
 // DOM 元素
@@ -26,7 +27,10 @@ const elements = {
     resultMessage: document.getElementById('resultMessage'),
     answerDetails: document.getElementById('answerDetails'),
     answerGrid: document.getElementById('answerGrid'),
-    toastMessage: document.getElementById('toastMessage')
+    toastMessage: document.getElementById('toastMessage'),
+    
+    alphabetTable: document.getElementById('alphabetTable'),
+    alphabetGrid: document.getElementById('alphabetGrid')
 };
 
 // API 调用函数
@@ -69,11 +73,13 @@ async function startNewGame() {
         gameState.gameOver = false;
         gameState.won = false;
         gameState.guessHistory = [];
+        gameState.alphabetStatus = {};
         
         showGameGrid();
         updateAttemptInfo();
         clearGuessHistory();
         clearCurrentGuess();
+        initializeAlphabetTable();
         elements.wordInput.focus();
     } else {
         showToast(result.message || '开始游戏失败');
@@ -105,6 +111,7 @@ async function submitGuess() {
     
     if (result.success) {
         addGuessToHistory(word, result.result);
+        updateAlphabetStatus(result.result);
         gameState.attempts = result.attempts;
         updateAttemptInfo();
         
@@ -366,8 +373,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 已移除实时查询拼音声调功能，现在使用默认的'-'符号代替
 
+// 字母表相关函数
+function initializeAlphabetTable() {
+    const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    elements.alphabetGrid.innerHTML = '';
+    
+    gameState.alphabetStatus = {};
+    letters.forEach(letter => {
+        gameState.alphabetStatus[letter] = 'unknown';
+        
+        const letterElement = document.createElement('div');
+        letterElement.className = 'alphabet-letter unknown';
+        letterElement.textContent = letter;
+        letterElement.dataset.letter = letter;
+        elements.alphabetGrid.appendChild(letterElement);
+    });
+}
+
+function updateAlphabetStatus(guessResult) {
+    guessResult.forEach(charResult => {
+        const pinyin = charResult.pinyin.text.toLowerCase();
+        const colors = charResult.pinyin.colors;
+        
+        // 遍历拼音中的每个字母
+        for (let i = 0; i < pinyin.length; i++) {
+            const letter = pinyin[i];
+            const color = colors[i];
+            
+            if (letter && letter.match(/[a-z]/)) {
+                // 更新字母状态：correct > present > absent
+                if (color === 'blue') {
+                    gameState.alphabetStatus[letter] = 'correct';
+                } else if (color === 'yellow' && gameState.alphabetStatus[letter] !== 'correct') {
+                    gameState.alphabetStatus[letter] = 'present';
+                } else if (color === 'gray' && gameState.alphabetStatus[letter] === 'unknown') {
+                    gameState.alphabetStatus[letter] = 'absent';
+                }
+            }
+        }
+    });
+    
+    // 更新显示
+    updateAlphabetDisplay();
+}
+
+function updateAlphabetDisplay() {
+    const letterElements = elements.alphabetGrid.querySelectorAll('.alphabet-letter');
+    letterElements.forEach(element => {
+        const letter = element.dataset.letter;
+        const status = gameState.alphabetStatus[letter];
+        
+        element.className = `alphabet-letter ${status}`;
+    });
+}
+
+function toggleAlphabetTable() {
+    const isVisible = elements.alphabetTable.style.display !== 'none';
+    elements.alphabetTable.style.display = isVisible ? 'none' : 'flex';
+}
+
 // 全局函数，供HTML调用
 window.startNewGame = startNewGame;
 window.submitGuess = submitGuess;
 window.newGame = newGame;
 window.hideToast = hideToast;
+window.toggleAlphabetTable = toggleAlphabetTable;

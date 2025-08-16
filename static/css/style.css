@@ -417,6 +417,153 @@ body {
     }
 }
 
+/* 字母表速查 */
+.alphabet-table {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1002;
+}
+
+.alphabet-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    max-width: 90%;
+    max-height: 80%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.alphabet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+.alphabet-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.4rem;
+}
+
+.alphabet-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.alphabet-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.alphabet-legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+.legend-color.unknown {
+    background: #333;
+}
+
+.legend-color.absent {
+    background: rgba(120, 124, 126, 0.4);
+}
+
+.legend-color.present {
+    background: #c9b458;
+}
+
+.legend-color.correct {
+    background: #6a92e0;
+}
+
+.alphabet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
+    gap: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.alphabet-letter {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    border: 2px solid;
+    transition: all 0.3s ease;
+}
+
+.alphabet-letter.unknown {
+    background: #333;
+    color: white;
+    border-color: #333;
+}
+
+.alphabet-letter.absent {
+    background: rgba(120, 124, 126, 0.4);
+    color: #666;
+    border-color: rgba(120, 124, 126, 0.4);
+}
+
+.alphabet-letter.present {
+    background: #c9b458;
+    color: white;
+    border-color: #c9b458;
+    box-shadow: 0 2px 4px rgba(201, 180, 88, 0.3);
+}
+
+.alphabet-letter.correct {
+    background: #6a92e0;
+    color: white;
+    border-color: #6a92e0;
+    box-shadow: 0 2px 4px rgba(106, 146, 224, 0.3);
+}
+
 /* 响应式设计 */
 @media (max-width: 480px) {
     .container {
@@ -456,5 +603,29 @@ body {
         flex-direction: column;
         gap: 10px;
         text-align: center;
+    }
+    
+    .alphabet-content {
+        padding: 20px 15px;
+        max-width: 95%;
+    }
+    
+    .alphabet-grid {
+        grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+        gap: 6px;
+    }
+    
+    .alphabet-letter {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .alphabet-legend {
+        gap: 15px;
+    }
+    
+    .legend-item {
+        font-size: 0.8rem;
     }
 }
