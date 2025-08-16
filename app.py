@@ -65,7 +65,7 @@ class WordleGameWeb:
             "游戏人生", "追番狂魔", "夹带私货", "钱包见底",
             "工资到账",
             "摸鱼达人", "划水专家", "午休冠军", "迟到常客",
-            "早起困难", "周一恐惧",
+            "早起困难", "周一恐惧", "不想上班"
             
             # 彩蛋词（华南理工相关）
             "华南理工", "易烊千玺", "数学学院", "理辩理辩",
@@ -102,22 +102,27 @@ class WordleGameWeb:
                 char_result['chinese']['color'] = 'gray'
             
             # 比较拼音中的每个字母
+            # 首先构建答案的所有拼音字母集合
+            all_target_letters = set()
+            for target_py in target_pinyins:
+                all_target_letters.update(target_py)
+            
             guess_pinyin = guess_char_info.pinyin
+            current_target_pinyin = target_pinyins[i]  # 当前位置对应的汉字拼音
+            
             for j, letter in enumerate(guess_pinyin):
-                color = 'gray'
-                found_correct_position = False
-                for k, target_py in enumerate(target_pinyins):
-                    if j < len(target_py) and letter == target_py[j]:
-                        if k == i:
-                            color = 'blue'
-                            found_correct_position = True
-                            break
+                color = 'gray'  # 默认为灰色
                 
-                if not found_correct_position:
-                    for target_py in target_pinyins:
-                        if letter in target_py:
-                            color = 'yellow'
-                            break
+                # 首先判断字母是否在答案的拼音字母集合中
+                if letter in all_target_letters:
+                    # 字母在答案中存在，进一步判断位置
+                    if letter in current_target_pinyin:
+                        # 字母在当前位置的汉字拼音中存在，不管具体位置
+                        color = 'blue'
+                    else:
+                        # 字母在答案中存在但不在当前位置的汉字拼音中
+                        color = 'yellow'
+                # 如果字母不在答案的拼音字母集合中，保持灰色
                 
                 char_result['pinyin']['colors'].append(color)
             
