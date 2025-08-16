@@ -256,30 +256,7 @@ def game_status():
         "guess_history": game.guess_history
     })
 
-@app.route('/api/get_pinyin', methods=['POST'])
-def get_pinyin():
-    data = request.get_json()
-    word = data.get('word', '').strip()
-    
-    if not word:
-        return jsonify({"success": False, "message": "请提供词语"})
-    
-    try:
-        characters_info = []
-        for char in word:
-            char_info = WordProcessor.get_character_info(char)
-            characters_info.append({
-                'chinese': char_info.chinese,
-                'pinyin': char_info.pinyin,
-                'tone': char_info.tone
-            })
-        
-        return jsonify({
-            "success": True,
-            "characters": characters_info
-        })
-    except Exception as e:
-        return jsonify({"success": False, "message": f"处理错误: {e}"})
+# 已移除 /api/get_pinyin 接口，不再需要实时查询拼音
 
 if __name__ == '__main__':
     import os

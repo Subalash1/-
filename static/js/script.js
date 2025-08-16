@@ -349,76 +349,22 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (char !== '?') {
                 block.classList.add('filled');
-                // 对于非中文字符，显示等待状态
-                block.querySelector('.pinyin').textContent = '...';
-                block.querySelector('.tone').textContent = '...';
+                // 使用默认的-代替实时查询
+                block.querySelector('.pinyin').textContent = '-';
+                block.querySelector('.tone').textContent = '-';
             } else {
                 block.classList.remove('filled');
                 block.querySelector('.pinyin').textContent = '?';
                 block.querySelector('.tone').textContent = '?';
             }
         });
-        
-        // 检查是否为4个中文字符，如果是则获取拼音和声调
-        const chineseOnly = value.replace(/[^\u4e00-\u9fa5]/g, '');
-        if (value.length === 4 && chineseOnly === value) {
-            updateCurrentGuessInfo(value);
-        }
     });
     
     // 移除输入过程中的字符限制，支持输入法正常工作
     // 字符类型和长度检查都移到提交时进行
 });
 
-// 更新当前猜测的拼音和声调信息
-async function updateCurrentGuessInfo(word) {
-    if (!word || word.length === 0) return;
-    
-    try {
-        const charBlocks = elements.currentGuess.querySelectorAll('.char-block');
-        
-        // 先显示获取中状态
-        for (let i = 0; i < word.length; i++) {
-            const block = charBlocks[i];
-            if (i < charBlocks.length) {
-                block.querySelector('.pinyin').textContent = '获取中...';
-                block.querySelector('.tone').textContent = '获取中...';
-            }
-        }
-        
-        // 调用API获取拼音和声调
-        const result = await apiCall('/api/get_pinyin', 'POST', { word: word });
-        
-        if (result.success && result.characters) {
-            result.characters.forEach((charInfo, i) => {
-                if (i < charBlocks.length) {
-                    const block = charBlocks[i];
-                    block.querySelector('.pinyin').textContent = charInfo.pinyin || '?';
-                    block.querySelector('.tone').textContent = charInfo.tone ? `${charInfo.tone}声` : '?';
-                }
-            });
-        } else {
-            // 如果API调用失败，显示默认值
-            charBlocks.forEach((block, i) => {
-                if (i < word.length) {
-                    block.querySelector('.pinyin').textContent = '?';
-                    block.querySelector('.tone').textContent = '?';
-                }
-            });
-        }
-        
-    } catch (error) {
-        console.error('获取拼音信息失败:', error);
-        // 出错时显示默认值
-        const charBlocks = elements.currentGuess.querySelectorAll('.char-block');
-        charBlocks.forEach((block, i) => {
-            if (i < word.length) {
-                block.querySelector('.pinyin').textContent = '?';
-                block.querySelector('.tone').textContent = '?';
-            }
-        });
-    }
-}
+// 已移除实时查询拼音声调功能，现在使用默认的'-'符号代替
 
 // 全局函数，供HTML调用
 window.startNewGame = startNewGame;
