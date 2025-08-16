@@ -218,7 +218,7 @@ function createCharBlock(chinese, pinyin, tone) {
 function setCharBlockColor(charBlock, charResult, index) {
     // 设置中文字符颜色
     const chineseColor = charResult.chinese.color;
-    if (chineseColor === 'green') {
+    if (chineseColor === 'blue') {
         charBlock.classList.add('correct');
     } else if (chineseColor === 'yellow') {
         charBlock.classList.add('present');
@@ -234,8 +234,8 @@ function setCharBlockColor(charBlock, charResult, index) {
         const uniqueColors = [...new Set(pinyinColors)];
         if (uniqueColors.length === 1) {
             const color = uniqueColors[0];
-            if (color === 'green') {
-                pinyinDiv.style.color = '#6aaa64';
+            if (color === 'blue') {
+                pinyinDiv.style.color = '#6a92e0';
             } else if (color === 'yellow') {
                 pinyinDiv.style.color = '#c9b458';
             } else {
@@ -249,7 +249,7 @@ function setCharBlockColor(charBlock, charResult, index) {
                 const letter = pinyin[i];
                 const color = pinyinColors[i] || 'gray';
                 let colorCode;
-                if (color === 'green') colorCode = '#6aaa64';
+                if (color === 'blue') colorCode = '#6a92e0';
                 else if (color === 'yellow') colorCode = '#c9b458';
                 else colorCode = '#787c7e';
                 
@@ -264,8 +264,8 @@ function setCharBlockColor(charBlock, charResult, index) {
     const toneColors = charResult.tone.colors;
     if (toneColors && toneColors.length > 0) {
         const color = toneColors[0];
-        if (color === 'green') {
-            toneDiv.style.color = '#6aaa64';
+        if (color === 'blue') {
+            toneDiv.style.color = '#6a92e0';
         } else if (color === 'yellow') {
             toneDiv.style.color = '#c9b458';
         } else {
@@ -346,18 +346,22 @@ document.addEventListener('DOMContentLoaded', function() {
         charBlocks.forEach((block, index) => {
             const char = value[index] || '?';
             block.querySelector('.char').textContent = char;
-            block.querySelector('.pinyin').textContent = char === '?' ? '?' : '...';
-            block.querySelector('.tone').textContent = char === '?' ? '?' : '...';
             
             if (char !== '?') {
                 block.classList.add('filled');
+                // 对于非中文字符，显示等待状态
+                block.querySelector('.pinyin').textContent = '...';
+                block.querySelector('.tone').textContent = '...';
             } else {
                 block.classList.remove('filled');
+                block.querySelector('.pinyin').textContent = '?';
+                block.querySelector('.tone').textContent = '?';
             }
         });
         
-        // 如果输入了4个字符，异步获取拼音和声调
-        if (value.length === 4) {
+        // 检查是否为4个中文字符，如果是则获取拼音和声调
+        const chineseOnly = value.replace(/[^\u4e00-\u9fa5]/g, '');
+        if (value.length === 4 && chineseOnly === value) {
             updateCurrentGuessInfo(value);
         }
     });
@@ -368,29 +372,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 更新当前猜测的拼音和声调信息
 async function updateCurrentGuessInfo(word) {
+    if (!word || word.length === 0) return;
+    
     try {
-        // 模拟获取拼音和声调（实际应用中可能需要调用API）
         const charBlocks = elements.currentGuess.querySelectorAll('.char-block');
         
+        // 先显示获取中状态
         for (let i = 0; i < word.length; i++) {
-            const char = word[i];
             const block = charBlocks[i];
-            
-            // 这里简化处理，实际应用中应该调用后端API获取准确的拼音和声调
-            block.querySelector('.pinyin').textContent = '获取中...';
-            block.querySelector('.tone').textContent = '获取中...';
+            if (i < charBlocks.length) {
+                block.querySelector('.pinyin').textContent = '获取中...';
+                block.querySelector('.tone').textContent = '获取中...';
+            }
         }
         
-        // 延迟一下模拟网络请求
-        setTimeout(() => {
-            charBlocks.forEach(block => {
-                block.querySelector('.pinyin').textContent = '准备中';
-                block.querySelector('.tone').textContent = '准备中';
+        // 调用API获取拼音和声调
+        const result = await apiCall('/api/get_pinyin', 'POST', { word: word });
+        
+        if (result.success && result.characters) {
+            result.characters.forEach((charInfo, i) => {
+                if (i < charBlocks.length) {
+                    const block = charBlocks[i];
+                    block.querySelector('.pinyin').textContent = charInfo.pinyin || '?';
+                    block.querySelector('.tone').textContent = charInfo.tone ? `${charInfo.tone}声` : '?';
+                }
             });
-        }, 200);
+        } else {
+            // 如果API调用失败，显示默认值
+            charBlocks.forEach((block, i) => {
+                if (i < word.length) {
+                    block.querySelector('.pinyin').textContent = '?';
+                    block.querySelector('.tone').textContent = '?';
+                }
+            });
+        }
         
     } catch (error) {
         console.error('获取拼音信息失败:', error);
+        // 出错时显示默认值
+        const charBlocks = elements.currentGuess.querySelectorAll('.char-block');
+        charBlocks.forEach((block, i) => {
+            if (i < word.length) {
+                block.querySelector('.pinyin').textContent = '?';
+                block.querySelector('.tone').textContent = '?';
+            }
+        });
     }
 }
 

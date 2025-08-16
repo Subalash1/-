@@ -57,35 +57,19 @@ class WordleGameWeb:
         self.guess_history = []
         
         self.word_bank = [
-            # 传统词语
-            "春夏秋冬", "东南西北", "喜怒哀乐", "酸甜苦辣", 
-            "梅兰竹菊", "琴棋书画", "诗词歌赋", "金木水火",
-            "风花雪月", "山川河流", "日月星辰", "花鸟鱼虫",
-            "青红皂白", "黑白分明", "高低不平", "大小不一",
-            
+           
             # 搞怪幽默词
-            "黑人牙膏", "鸽鸽加油", "咸鱼翻身", "躺平摆烂",
-            "内卷神兽", "打工人生", "社畜日常", "奶茶续命",
-            "熬夜冠军", "秃头青年", "肥宅快乐", "佛系人生",
-            "吃瓜群众", "网络冲浪", "键盘侠客", "手机控制",
-            "外卖成精", "快递小哥", "直播带货", "短视频王",
-            "游戏人间", "追剧狂魔", "购物车空", "钱包见底",
-            "房贷压身", "车贷缠绕", "信用卡爆", "花呗透支",
-            "双十一穷", "六一八破", "年终奖无", "工资到账",
+            "黑人牙膏", "鸽鸽加油","奶茶续命",
+            "熬夜冠军", "秃头青年",
+            "吃瓜群众", "网络冲浪", 
+            "游戏人生", "追番狂魔", "夹带私货", "钱包见底",
+            "工资到账",
             "摸鱼达人", "划水专家", "午休冠军", "迟到常客",
-            "早起困难", "熬夜简单", "周一恐惧", "周五狂欢",
+            "早起困难", "周一恐惧",
             
             # 彩蛋词（华南理工相关）
             "华南理工", "易烊千玺", "数学学院", "理辩理辩",
-            "五山校区", "大学城区", "建筑老八", "机械制造",
-            "电子信息", "计算机科", "材料科学", "化学工程",
-            "土木建筑", "环境工程", "食品科学", "轻工技术",
-            "经济管理", "新闻传播", "外国语言", "马克思主",
-            "体育学院", "艺术学院", "医学院系", "法学院系",
-            "华工学子", "红满堂前", "逸夫楼下", "图书馆里",
-            "实验室内", "食堂排队", "宿舍生活", "社团活动",
-            "学术竞赛", "创新创业", "实习实践", "毕业设计",
-            "校园恋爱", "青春岁月", "友谊长存", "师生情深"
+            "五山校区", "建筑老八", "食堂排队", "民国宿舍"
         ]
     
     def start_new_game(self):
@@ -111,7 +95,7 @@ class WordleGameWeb:
             
             # 比较中文字符
             if guess_char_info.chinese == target_chars[i]:
-                char_result['chinese']['color'] = 'green'
+                char_result['chinese']['color'] = 'blue'
             elif guess_char_info.chinese in target_chars:
                 char_result['chinese']['color'] = 'yellow'
             else:
@@ -125,7 +109,7 @@ class WordleGameWeb:
                 for k, target_py in enumerate(target_pinyins):
                     if j < len(target_py) and letter == target_py[j]:
                         if k == i:
-                            color = 'green'
+                            color = 'blue'
                             found_correct_position = True
                             break
                 
@@ -140,7 +124,7 @@ class WordleGameWeb:
             # 比较声调
             guess_tone = guess_char_info.tone
             if guess_tone == target_tones[i]:
-                char_result['tone']['colors'].append('green')
+                char_result['tone']['colors'].append('blue')
             elif guess_tone in target_tones:
                 char_result['tone']['colors'].append('yellow')
             else:
@@ -271,6 +255,31 @@ def game_status():
         "won": game.won,
         "guess_history": game.guess_history
     })
+
+@app.route('/api/get_pinyin', methods=['POST'])
+def get_pinyin():
+    data = request.get_json()
+    word = data.get('word', '').strip()
+    
+    if not word:
+        return jsonify({"success": False, "message": "请提供词语"})
+    
+    try:
+        characters_info = []
+        for char in word:
+            char_info = WordProcessor.get_character_info(char)
+            characters_info.append({
+                'chinese': char_info.chinese,
+                'pinyin': char_info.pinyin,
+                'tone': char_info.tone
+            })
+        
+        return jsonify({
+            "success": True,
+            "characters": characters_info
+        })
+    except Exception as e:
+        return jsonify({"success": False, "message": f"处理错误: {e}"})
 
 if __name__ == '__main__':
     import os
